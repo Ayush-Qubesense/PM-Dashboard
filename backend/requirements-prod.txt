@@ -1,0 +1,15 @@
+# Production dependencies (Render free tier — 512 MB RAM)
+# torch and shap are intentionally excluded:
+#   - ml_engine.py handles their absence with try/except (LSTM disabled, SHAP
+#     falls back to feature importances) so the app still runs fully.
+#   - Excluding them saves ~400 MB RAM, keeping the process within the free limit.
+# Use requirements.txt locally to get SHAP explanations and the LSTM model.
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pandas==2.2.3
+numpy==2.1.3
+python-multipart==0.0.17
+pydantic==2.10.1
+scikit-learn==1.5.2
+xgboost==2.1.3
+lightgbm==4.5.0

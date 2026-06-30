@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Health & Predictive Maintenance — OpsFlo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  * { font-family: 'Inter', system-ui, sans-serif; }
+  body { margin: 0; background: #f1f5f9; overflow: hidden; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+  .sparkline-path { fill: none; stroke-width: 1.5; stroke-linejoin: round; }
+  .gauge-arc { fill: none; stroke-linecap: round; }
+  .risk-badge-Critical  { background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5; }
+  .risk-badge-High      { background:#fff7ed; color:#c2410c; border:1px solid #fdba74; }
+  .risk-badge-Medium    { background:#fffbeb; color:#b45309; border:1px solid #fcd34d; }
+  .risk-badge-Low       { background:#f0fdf4; color:#15803d; border:1px solid #86efac; }
+  .score-Critical { color:#dc2626; }
+  .score-High     { color:#ea580c; }
+  .score-Medium   { color:#d97706; }
+  .score-Low      { color:#16a34a; }
+  .row-selected { background:#eff6ff !important; }
+  .row-selected td { border-bottom-color:#bfdbfe !important; }
+  tr.asset-row:hover { background:#f8fafc; cursor:pointer; }
+  .toast { animation: fadeInOut 3s forwards; }
+  @keyframes fadeInOut {
+    0%   { opacity:0; transform:translateY(-8px); }
+    10%  { opacity:1; transform:translateY(0); }
+    80%  { opacity:1; }
+    100% { opacity:0; }
+  }
+  .prob-bar { transition: width 0.6s ease; }
+  /* Sidebar collapse */
+  #sidebar { transition: width 0.22s ease; }
+  #sidebar.collapsed { width: 56px; }
+  #sidebar.collapsed .sb-logo-img,
+  #sidebar.collapsed .sb-label,
+  #sidebar.collapsed .sb-badge,
+  #sidebar.collapsed .sb-chevron,
+  #sidebar.collapsed .sb-footer { display: none; }
+  #sidebar.collapsed .sb-logo-row { justify-content: center; padding: 10px 0; }
+  #sidebar.collapsed .sb-nav-btn { justify-content: center; padding-left: 0; padding-right: 0; gap: 0; }
+  #sidebar.collapsed .sb-toggle-icon { transform: rotate(180deg); }
+  .sb-toggle-icon { transition: transform 0.22s ease; }
+</style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+<!-- Sidebar -->
+<aside id="sidebar" class="w-[232px] min-h-screen bg-[#0f172a] border-r border-slate-800 flex flex-col flex-shrink-0 shadow-sm">
+
+  <!-- Logo row -->
+  <div class="sb-logo-row flex items-center justify-between px-4 py-3 border-b border-slate-800">
+    <img class="sb-logo-img" src="data:image/png;base64,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" alt="OpsFlo QA" style="height:36px;object-fit:contain"/>
+    <button id="sidebarToggle" class="text-slate-500 hover:text-slate-200 p-1 rounded hover:bg-slate-800 transition-colors flex-shrink-0" title="Collapse sidebar">
+      <svg class="sb-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Nav -->
+  <nav class="flex-1 overflow-y-auto py-1.5" id="nav">
+    <!-- Items injected by JS -->
+  </nav>
+
+  <!-- Footer -->
+  <div class="sb-footer px-4 py-3 border-t border-slate-800 flex items-center justify-center">
+    <img src="data:image/png;base64,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" alt="OpsFlo QA" style="height:28px;object-fit:contain;opacity:0.55"/>
+  </div>
+
+</aside>
+
+<!-- Main -->
+<div class="flex flex-col flex-1 min-w-0 overflow-hidden">
+
+  <!-- Header -->
+  <header class="bg-[#0f172a] border-b border-slate-800 px-5 py-3 flex items-center justify-between flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+      <span class="font-semibold text-white text-sm">AI Health &amp; Predictive Maintenance</span>
+      <span class="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold">Beta</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <select id="dateRange" class="text-xs bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="7d">Last 7 Days</option>
+        <option value="30d">Last 30 Days</option>
+        <option value="90d">Last 90 Days</option>
+      </select>
+      <button class="text-slate-400 hover:text-slate-200 relative">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="absolute -top-1 -right-1 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+      </button>
+      <button class="flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-slate-200 hover:bg-slate-700">
+        <span class="font-medium">NG Fleet</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 flex flex-col overflow-hidden p-4 gap-3">
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-5 gap-3 flex-shrink-0" id="kpiCards">
+      <div class="col-span-5 h-[120px] bg-white rounded-xl flex items-center justify-center text-slate-400 text-sm">
+        Loading fleet metrics...
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Three panels -->
+    <div class="grid gap-3 flex-1 min-h-0" style="grid-template-columns:30% 1fr 28%;">
+
+      <!-- LEFT: Asset Health List -->
+      <div class="bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col overflow-hidden">
+        <div class="px-4 pt-4 pb-3 border-b border-slate-100">
+          <h2 class="font-semibold text-slate-800 text-sm mb-2">Asset Health</h2>
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input id="searchInput" placeholder="Search assets..." class="w-full pl-7 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <button id="filterToggle" class="flex items-center gap-1 px-3 py-1.5 text-xs border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+              Filters
+            </button>
+          </div>
+          <div id="filterPanel" class="hidden mt-2 flex gap-2 flex-wrap">
+            <select id="sortSelect" class="text-xs border border-slate-200 rounded px-2 py-1 text-slate-600 focus:outline-none">
+              <option value="risk_level">Sort: Risk Level</option>
+              <option value="health_score">Sort: Health Score</option>
+              <option value="eta">Sort: ETA</option>
+            </select>
+            <button data-risk="Critical" class="risk-filter-btn text-xs px-2 py-1 rounded border border-slate-200 text-slate-500 hover:bg-slate-50">Critical</button>
+            <button data-risk="High" class="risk-filter-btn text-xs px-2 py-1 rounded border border-slate-200 text-slate-500 hover:bg-slate-50">High</button>
+            <button data-risk="Medium" class="risk-filter-btn text-xs px-2 py-1 rounded border border-slate-200 text-slate-500 hover:bg-slate-50">Medium</button>
+            <button data-risk="Low" class="risk-filter-btn text-xs px-2 py-1 rounded border border-slate-200 text-slate-500 hover:bg-slate-50">Low</button>
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-auto">
+          <table class="w-full text-xs border-collapse">
+            <thead class="sticky top-0 bg-slate-50 z-10">
+              <tr class="border-b border-slate-100">
+                <th class="text-left px-4 py-2 font-semibold text-slate-500 whitespace-nowrap">Asset</th>
+                <th class="text-left px-3 py-2 font-semibold text-slate-500">Health</th>
+                <th class="text-left px-3 py-2 font-semibold text-slate-500">Risk</th>
+                <th class="text-left px-3 py-2 font-semibold text-slate-500">Top Risk</th>
+                <th class="text-left px-3 py-2 font-semibold text-slate-500">Issue</th>
+                <th class="text-left px-3 py-2 font-semibold text-slate-500">ETA</th>
+              </tr>
+            </thead>
+            <tbody id="assetTableBody">
+              <tr><td colspan="6" class="text-center py-8 text-slate-400">Loading assets...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="px-4 py-2.5 border-t border-slate-100 flex items-center justify-between">
+          <span id="pageInfo" class="text-xs text-slate-500">—</span>
+          <div id="pageBtns" class="flex items-center gap-1"></div>
+        </div>
+      </div>
+
+      <!-- MIDDLE: Asset Detail -->
+      <div id="detailPanel" class="bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col overflow-auto">
+        <div class="flex-1 flex flex-col items-center justify-center gap-3 text-slate-300">
+          <svg width="64" height="44" viewBox="0 0 200 130" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="10" y="30" width="180" height="80" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+            <rect x="20" y="40" width="60" height="60" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+            <circle cx="120" cy="70" r="30" fill="#f1f5f9" stroke="#e2e8f0"/>
+            <circle cx="120" cy="70" r="15" fill="#e2e8f0" stroke="#e2e8f0"/>
+            <rect x="158" y="45" width="22" height="50" rx="3" fill="#eff6ff" stroke="#dbeafe"/>
+            <rect x="60" y="15" width="10" height="25" rx="3" fill="#f1f5f9" stroke="#e2e8f0"/>
+            <circle cx="40" cy="118" r="10" fill="#f1f5f9" stroke="#e2e8f0"/>
+            <circle cx="160" cy="118" r="10" fill="#f1f5f9" stroke="#e2e8f0"/>
+          </svg>
+          <p class="text-sm text-slate-400">Select an asset to view details</p>
+        </div>
+      </div>
+
+      <!-- RIGHT: Recs + PM -->
+      <div class="flex flex-col gap-3 overflow-auto">
+        <!-- AI Recommendations -->
+        <div class="bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col">
+          <div class="px-4 pt-4 pb-3 border-b border-slate-100">
+            <h2 class="font-semibold text-slate-800 text-sm">AI Recommended Actions</h2>
+          </div>
+          <div id="recsPanel" class="p-4 space-y-3 flex-1">
+            <p class="text-xs text-slate-400 text-center py-3">Select an asset to view recommendations</p>
+          </div>
+          <button id="viewAllRecs" class="hidden items-center justify-center gap-1 text-xs text-blue-600 hover:text-blue-800 py-2.5 border-t border-slate-100">
+            View all recommendations
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <!-- PM Optimization -->
+        <div class="bg-white rounded-xl border border-slate-100 shadow-sm">
+          <div class="px-4 pt-4 pb-3 border-b border-slate-100">
+            <h2 class="font-semibold text-slate-800 text-sm">PM Job Optimization</h2>
+          </div>
+          <div id="pmPanel" class="p-4">
+            <div class="flex flex-col items-center gap-2 py-3">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
+              <p class="text-xs text-slate-400">No PM adjustments available</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════════════════
+const state = {
+  sort: 'risk_level',
+  riskFilter: null,
+  page: 1,
+  selectedId: null,
+  acceptedRecs: new Set(),
+}
+
+// ═══════════════════════════════════════════════════════
+// Sidebar nav
+// ═══════════════════════════════════════════════════════
+const navItems = [
+  { label: 'Overview',    icon: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
+  { label: 'Assets',      icon: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>' },
+  { label: 'Map',         icon: '<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>' },
+  { label: 'Jobs',        icon: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>' },
+  { label: 'Work Orders', icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>' },
+  { label: 'AI Health',   icon: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>', active: true, badge: 'New' },
+  { label: 'Maintenance', icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>' },
+  { label: 'Parts',       icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>' },
+  { label: 'Reports',     icon: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>' },
+  { label: 'Alerts',      icon: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>' },
+  { label: 'Settings',    icon: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>' },
+]
+
+document.getElementById('nav').innerHTML = navItems.map(item => `
+  <button class="sb-nav-btn w-full flex items-center gap-3 px-4 py-[10px] transition-colors relative group ${
+    item.active ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+  }">
+    ${item.active ? '<span style="position:absolute;right:0;top:0;bottom:0;width:3px;background:#3b82f6;border-radius:2px 0 0 2px"></span>' : ''}
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+         stroke="${item.active ? '#60a5fa' : '#64748b'}"
+         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+         style="flex-shrink:0">${item.icon}</svg>
+    <span class="sb-label text-[13px] font-medium flex-1 text-left leading-none">${item.label}</span>
+    ${item.badge ? `<span class="sb-badge" style="background:#3b82f6;color:white;font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700;line-height:1.4">${item.badge}</span>` : ''}
+    <svg class="sb-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none"
+         stroke="${item.active ? '#60a5fa' : '#334155'}"
+         stroke-width="2.5" stroke-linecap="round">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  </button>
+`).join('')
+
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('collapsed')
+})
+
+// ═══════════════════════════════════════════════════════
+// Helpers
+// ═══════════════════════════════════════════════════════
+function riskBadge(risk) {
+  return `<span class="risk-badge-${risk} text-[10px] px-1.5 py-0.5 rounded font-semibold">${risk}</span>`
+}
+function scoreClass(s) {
+  return s < 25 ? 'score-Critical' : s < 50 ? 'score-High' : s < 75 ? 'score-Medium' : 'score-Low'
+}
+function probColor(fp) {
+  return fp >= 0.8 ? '#ef4444' : fp >= 0.6 ? '#f97316' : fp >= 0.4 ? '#f59e0b' : '#22c55e'
+}
+function probBg(fp) {
+  return fp >= 0.8 ? 'bg-red-500' : fp >= 0.6 ? 'bg-orange-500' : fp >= 0.4 ? 'bg-amber-500' : 'bg-green-500'
+}
+function confColor(c) {
+  return c === 'High' ? 'text-red-600' : c === 'Medium' ? 'text-amber-600' : 'text-green-600'
+}
+
+function sparklineSVG(values) {
+  if (!values || values.length < 2) return ''
+  const w = 52, h = 20
+  const min = Math.min(...values), max = Math.max(...values)
+  const range = max - min || 1
+  const pts = values.map((v, i) =>
+    `${(i / (values.length - 1)) * w},${h - ((v - min) / range) * (h - 4) - 2}`
+  ).join(' ')
+  const last = values[values.length - 1]
+  const color = last >= 75 ? '#22c55e' : last >= 50 ? '#f59e0b' : last >= 25 ? '#f97316' : '#ef4444'
+  return `<svg width="${w}" height="${h}"><polyline class="sparkline-path" points="${pts}" stroke="${color}"/></svg>`
+}
+
+function gaugeSVG(score, label) {
+  const cx=80, cy=80, r=60, sw=15
+  const toRad = d => d * Math.PI / 180
+  const arcX = d => cx + r * Math.cos(toRad(d))
+  const arcY = d => cy + r * Math.sin(toRad(d))
+  const bgPath = `M ${arcX(180)} ${arcY(180)} A ${r} ${r} 0 0 1 ${arcX(0)} ${arcY(0)}`
+  const deg = 180 - (score / 100) * 180
+  const ex = arcX(deg), ey = arcY(deg)
+  const large = score > 50 ? 1 : 0
+  const scorePath = `M ${arcX(180)} ${arcY(180)} A ${r} ${r} 0 ${large} 1 ${ex} ${ey}`
+  const color = score >= 75 ? '#22c55e' : score >= 50 ? '#f59e0b' : score >= 25 ? '#f97316' : '#ef4444'
+  return `
+    <svg width="160" height="88" viewBox="0 0 160 88">
+      <path d="${bgPath}" class="gauge-arc" stroke="#e2e8f0" stroke-width="${sw}"/>
+      <path d="${scorePath}" class="gauge-arc" stroke="${color}" stroke-width="${sw}"/>
+      <text x="${cx}" y="57" text-anchor="middle" font-size="26" font-weight="700" fill="#1e293b">${score}</text>
+      <text x="${cx}" y="73" text-anchor="middle" font-size="11" font-weight="600" fill="${color}">${label}</text>
+    </svg>`
+}
+
+function genIcon() {
+  return `<img src="/assets/generator.png" class="w-full h-full object-contain" alt="Generator"/>`
+}
+
+function showToast(msg, type = 'success') {
+  const c = document.getElementById('toastContainer')
+  const d = document.createElement('div')
+  const bg = type === 'info'
+    ? 'bg-blue-50 border-blue-200 text-blue-700'
+    : type === 'success'
+    ? 'bg-green-50 border-green-200 text-green-700'
+    : 'bg-red-50 border-red-200 text-red-700'
+  const icon = type === 'info'
+    ? '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'
+    : '<polyline points="20 6 9 17 4 12"/>'
+  d.className = `toast ${bg} border text-xs px-3 py-2 rounded-lg shadow-sm flex items-center gap-2`
+  d.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${icon}</svg>${msg}`
+  c.appendChild(d)
+  setTimeout(() => d.remove(), 3200)
+}
+
+// ═══════════════════════════════════════════════════════
+// Fleet KPIs
+// ═══════════════════════════════════════════════════════
+async function loadKPIs() {
+  const res = await fetch('/api/fleet/kpis')
+  const k = await res.json()
+  document.getElementById('kpiCards').innerHTML = `
+    <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-4 pt-3 pb-1 flex flex-col">
+      <span class="text-[10px] font-semibold text-slate-500 mb-0.5">Fleet Health Index</span>
+      <div class="flex flex-1 items-center justify-center">
+        ${gaugeSVG(Math.round(k.health_index), k.health_label)}
+      </div>
+    </div>
+    ${kpiCard('At Risk Assets', k.at_risk_count.toLocaleString(),
+      `<span class="flex items-center gap-1 text-amber-600 text-[10px]">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        ${k.at_risk_delta} vs last 7 days
+      </span>`)}
+    ${kpiCard('Critical Alerts', k.critical_alert_count.toLocaleString(),
+      '<span class="text-red-500 text-[10px] font-medium">Requires attention</span>')}
+    ${kpiCard('Predicted Failures (30d)', k.predicted_failures_30d.toLocaleString(),
+      '<span class="text-amber-600 text-[10px] font-medium">High confidence</span>')}
+    ${kpiCard('PM Jobs Adjusted', k.pm_jobs_adjusted_count.toLocaleString(),
+      '<span class="text-blue-600 text-[10px] font-medium">This week</span>')}
+  `
+}
+
+function kpiCard(title, value, sub) {
+  return `<div class="bg-white rounded-xl border border-slate-100 shadow-sm px-4 pt-3 pb-3 flex flex-col justify-between">
+    <p class="text-[10px] font-semibold text-slate-500 mb-2">${title}</p>
+    <div>
+      <p class="text-3xl font-bold text-slate-800 mb-1">${value}</p>
+      ${sub}
+    </div>
+  </div>`
+}
+
+// ═══════════════════════════════════════════════════════
+// Asset Health List
+// ═══════════════════════════════════════════════════════
+async function loadAssets() {
+  const params = new URLSearchParams({ sort: state.sort, page: state.page, limit: 5 })
+  if (state.riskFilter) params.set('risk_level', state.riskFilter)
+  const res = await fetch('/api/fleet/assets/health?' + params)
+  const data = await res.json()
+
+  const tbody = document.getElementById('assetTableBody')
+  tbody.innerHTML = data.assets.map(a => `
+    <tr class="asset-row border-b border-slate-50 transition-colors ${state.selectedId === a.asset_id ? 'row-selected' : ''}"
+        data-id="${a.asset_id}">
+      <td class="px-4 py-2.5">
+        <div class="flex items-center gap-2">
+          <div class="w-12 h-12 rounded bg-white flex items-center justify-center flex-shrink-0 border border-slate-100">${genIcon()}</div>
+          <div>
+            <div class="font-semibold text-slate-800 text-[11px]">${a.display_name}</div>
+            <div class="text-slate-400 text-[10px]">${a.capacity_kw} kW</div>
+          </div>
+        </div>
+      </td>
+      <td class="px-3 py-2.5">
+        <div class="font-bold text-sm ${scoreClass(a.health_score)}">${a.health_score}</div>
+        ${sparklineSVG(a.sparkline)}
+      </td>
+      <td class="px-3 py-2.5">${riskBadge(a.risk_level)}</td>
+      <td class="px-3 py-2.5 text-slate-600 text-[11px]">${a.top_risk_parameter ?? '—'}</td>
+      <td class="px-3 py-2.5 text-slate-600 text-[11px]">${a.predicted_issue ?? '—'}</td>
+      <td class="px-3 py-2.5 text-slate-600 text-[11px] whitespace-nowrap">${a.predicted_eta_label ?? '—'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs">No assets found</td></tr>'
+
+  // Attach click handlers
+  tbody.querySelectorAll('.asset-row').forEach(row => {
+    row.addEventListener('click', () => selectAsset(row.dataset.id))
+  })
+
+  // Pagination info
+  const total = data.total
+  const start = (state.page - 1) * 5 + 1
+  const end = Math.min(state.page * 5, total)
+  document.getElementById('pageInfo').textContent = total > 0 ? `${start}–${end} of ${total.toLocaleString()} assets` : '—'
+
+  const totalPages = Math.ceil(total / 5)
+  const pageBtns = document.getElementById('pageBtns')
+  const maxBtns = Math.min(7, totalPages)
+  pageBtns.innerHTML = Array.from({ length: maxBtns }, (_, i) => {
+    const p = i + 1
+    const active = p === state.page
+    return `<button data-page="${p}" class="page-btn w-6 h-6 rounded text-[11px] font-medium transition-colors ${
+      active ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
+    }">${p}</button>`
+  }).join('') + (totalPages > 7 ? '<span class="text-slate-400 text-xs">…</span>' : '')
+
+  pageBtns.querySelectorAll('.page-btn').forEach(btn => {
+    btn.addEventListener('click', () => { state.page = +btn.dataset.page; loadAssets() })
+  })
+}
+
+// ═══════════════════════════════════════════════════════
+// Asset Detail + Recommendations
+// ═══════════════════════════════════════════════════════
+function timeAgo(isoStr) {
+  if (!isoStr) return 'Unknown'
+  const diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 60000)
+  if (diff < 1) return 'Just now'
+  if (diff < 60) return `${diff} min ago`
+  if (diff < 1440) return `${Math.floor(diff / 60)} hr ago`
+  return `${Math.floor(diff / 1440)}d ago`
+}
+
+function riskBadgeFull(risk) {
+  const cls = { Critical: 'bg-red-600 text-white', High: 'bg-orange-500 text-white', Medium: 'bg-amber-500 text-white', Low: 'bg-green-500 text-white' }
+  return `<span class="text-xs px-2 py-0.5 rounded font-semibold ${cls[risk]}">${risk} Risk</span>`
+}
+
+const REC_COLORS = {
+  CREATE_WO: 'bg-red-600 hover:bg-red-700 text-white',
+  ADJUST_PM: 'bg-blue-600 hover:bg-blue-700 text-white',
+  ADD_TASK:  'bg-slate-600 hover:bg-slate-700 text-white',
+  MONITOR:   'bg-slate-500 hover:bg-slate-600 text-white',
+}
+
+async function selectAsset(id) {
+  state.selectedId = id
+  // Highlight row
+  document.querySelectorAll('.asset-row').forEach(r => r.classList.toggle('row-selected', r.dataset.id === id))
+
+  const panel = document.getElementById('detailPanel')
+  panel.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 text-xs">Loading...</div>'
+  document.getElementById('recsPanel').innerHTML = '<p class="text-xs text-slate-400 text-center py-3">Loading...</p>'
+  document.getElementById('viewAllRecs').classList.add('hidden')
+
+  const [detail, recs] = await Promise.all([
+    fetch(`/api/assets/${id}/detail`).then(r => r.json()),
+    fetch(`/api/assets/${id}/recommendations`).then(r => r.json()),
+  ])
+
+  renderDetail(detail, panel)
+  renderRecs(recs)
+}
+
+function renderDetail(d, panel) {
+  const t = d.latest_telemetry
+  const p = d.prediction
+  const fp = p.failure_probability
+  const fpPct = Math.round(fp * 100)
+
+  panel.innerHTML = `
+    <div class="px-4 pt-4 pb-3 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="font-bold text-slate-800">${d.display_name}</span>
+        ${riskBadgeFull(d.risk_level)}
+      </div>
+      <span class="text-xs text-slate-400">${d.capacity_kw} kW</span>
+    </div>
+
+    <div class="relative border-b border-slate-100">
+      <img src="/assets/generator.png" class="w-full h-44 object-contain bg-slate-50" alt="Generator"/>
+      ${d.risk_level === 'Critical' || d.risk_level === 'High' ?
+        '<div class="absolute top-2 right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">!</div>' : ''}
+    </div>
+
+    <div class="grid grid-cols-3 gap-2 px-4 py-2 border-b border-slate-100 text-[10px] text-slate-500">
+      <div class="flex items-center gap-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        ${d.location_city}, ${d.location_state}
+      </div>
+      <div class="flex items-center gap-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${t.runtime_hours ? Math.round(t.runtime_hours).toLocaleString() + ' hrs' : '—'}
+      </div>
+      <div class="flex items-center gap-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>
+        ${timeAgo(t.recorded_at)}
+      </div>
+    </div>
+
+    <div class="px-4 py-3 border-b border-slate-100">
+      <h3 class="text-[10px] font-semibold text-slate-700 mb-1">AI Risk Summary</h3>
+      <p class="text-[11px] text-slate-600 leading-relaxed">${d.ai_risk_summary}</p>
+    </div>
+
+    <div class="px-4 py-3 border-b border-slate-100 space-y-2.5">
+      <div>
+        <div class="flex justify-between text-[10px] mb-1">
+          <span class="text-slate-600 font-medium">Failure Probability</span>
+          <span class="font-bold ${fp >= 0.8 ? 'text-red-600' : fp >= 0.5 ? 'text-amber-600' : 'text-green-600'}">${fpPct}%</span>
+        </div>
+        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div class="prob-bar h-full rounded-full ${probBg(fp)}" style="width:${fpPct}%"></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-[10px]">
+        <div>
+          <span class="text-slate-500">Predicted Time to Failure</span>
+          <div class="font-semibold text-slate-800 mt-0.5">${p.predicted_eta_label ?? 'No imminent failure'}</div>
+        </div>
+        <div>
+          <span class="text-slate-500">Confidence</span>
+          <div class="font-semibold mt-0.5 ${confColor(p.confidence_level)}">${p.confidence_level}</div>
+        </div>
+      </div>
+    </div>
+
+    ${p.contributing_factors.length ? `
+    <div class="px-4 py-3 border-b border-slate-100">
+      <h3 class="text-[10px] font-semibold text-slate-700 mb-2">Contributing Factors</h3>
+      <ul class="space-y-1.5">
+        ${p.contributing_factors.map(f => `
+          <li class="flex items-start gap-2 text-[10px]">
+            <span class="mt-1 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span>
+            <span class="text-slate-600"><span class="font-medium text-slate-700">${f.parameter}</span> — ${f.deviation}</span>
+          </li>`).join('')}
+      </ul>
+    </div>` : ''}
+
+    <div class="px-4 py-3">
+      <h3 class="text-[10px] font-semibold text-slate-700 mb-2">Live Telemetry</h3>
+      <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+        ${telRow('Coolant Temp', t.coolant_temp_f != null ? t.coolant_temp_f.toFixed(1) + '°F' : null)}
+        ${telRow('Oil Pressure', t.oil_pressure_psi != null ? t.oil_pressure_psi.toFixed(1) + ' PSI' : null)}
+        ${telRow('Engine RPM', t.rpm != null ? Math.round(t.rpm).toLocaleString() : null)}
+        ${telRow('kW Output', t.kw_output != null ? t.kw_output.toFixed(0) + ' kW' : null)}
+        ${telRow('Voltage A', t.voltage_a != null ? t.voltage_a.toFixed(1) + ' V' : null)}
+        ${telRow('Frequency', t.frequency_hz != null ? t.frequency_hz.toFixed(2) + ' Hz' : null)}
+        ${telRow('Power Factor', t.power_factor != null ? t.power_factor.toFixed(3) : null)}
+        ${telRow('Fuel Type', t.fuel_type)}
+      </div>
+    </div>
+  `
+}
+
+function telRow(label, val) {
+  return `<div class="flex justify-between"><span class="text-slate-400">${label}</span><span class="font-medium text-slate-700">${val ?? '—'}</span></div>`
+}
+
+const recIcons = {
+  CREATE_WO: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  ADJUST_PM: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  ADD_TASK:  '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  MONITOR:   '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+}
+
+function renderRecs(recs) {
+  const panel = document.getElementById('recsPanel')
+  const viewAll = document.getElementById('viewAllRecs')
+
+  if (!recs.recommendations.length) {
+    panel.innerHTML = '<p class="text-xs text-slate-400 text-center py-3">No recommendations</p>'
+    viewAll.classList.add('hidden')
+    return
+  }
+
+  panel.innerHTML = recs.recommendations.map(r => {
+    const done = state.acceptedRecs.has(r.rec_id)
+    const icon = recIcons[r.rec_type] ?? recIcons.MONITOR
+    const btnClass = done ? '' : (REC_COLORS[r.rec_type] ?? REC_COLORS.MONITOR)
+    return `
+      <div class="flex items-start gap-3 p-3 rounded-lg border transition-all ${done ? 'border-green-200 bg-green-50 opacity-70' : 'border-slate-100 bg-slate-50'}" data-rec-id="${r.rec_id}" data-rec-title="${r.title}">
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${done ? 'bg-green-100' : 'bg-blue-100'}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${done ? '#16a34a' : '#2563eb'}" stroke-width="2">${done ? '<polyline points="20 6 9 17 4 12"/>' : icon}</svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs font-semibold text-slate-800 mb-0.5">${r.title}</div>
+          <div class="text-[10px] text-slate-500 leading-relaxed line-clamp-2">${r.description}</div>
+          <div class="mt-2">
+            ${done
+              ? '<span class="text-[10px] text-green-600 font-medium">Done</span>'
+              : `<button class="rec-accept-btn text-[10px] px-2.5 py-1 rounded-lg font-semibold transition-colors ${btnClass}">${r.action_label}</button>`
+            }
+          </div>
+        </div>
+      </div>
+    `
+  }).join('')
+
+  // Accept buttons
+  panel.querySelectorAll('.rec-accept-btn').forEach(btn => {
+    const card = btn.closest('[data-rec-id]')
+    btn.addEventListener('click', async () => {
+      const rid = card.dataset.recId
+      const title = card.dataset.recTitle
+      await fetch(`/api/recommendations/${rid}/accept`, { method: 'POST' })
+      state.acceptedRecs.add(rid)
+      showToast(`"${title}" submitted successfully`)
+      renderRecs(recs)
+    })
+  })
+
+  viewAll.classList.remove('hidden')
+  viewAll.style.display = 'flex'
+
+  // PM Job
+  renderPM(recs.pm_job)
+}
+
+function renderPM(job) {
+  const panel = document.getElementById('pmPanel')
+  if (!job) {
+    panel.innerHTML = `
+      <div class="flex flex-col items-center gap-2 py-3">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <p class="text-xs text-slate-400">No PM adjustments for this asset</p>
+      </div>`
+    return
+  }
+  const scopePct = 100 - job.adjustment_pct
+  panel.innerHTML = `
+    <div class="space-y-3">
+      <div class="flex items-center gap-2">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span class="text-xs font-semibold text-slate-800">${job.job_code} – ${job.job_name}</span>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <p class="text-[10px] text-slate-500 mb-0.5">Original Due</p>
+          <p class="text-xs font-semibold text-slate-700">${job.original_due_date}</p>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-500 mb-0.5">Adjusted Due</p>
+          <p class="text-xs font-semibold text-amber-600">${job.adjusted_due_date}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="flex items-center gap-1 text-[10px] bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-lg font-medium">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          ${job.adjustment_pct}% shorter
+        </span>
+        <span class="text-[10px] text-slate-500">${job.adjustment_reason}</span>
+      </div>
+      <div class="space-y-1.5">
+        <div>
+          <p class="text-[10px] text-slate-500 mb-0.5">Original Scope</p>
+          <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-400 rounded-full" style="width:100%"></div>
+          </div>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-500 mb-0.5">Adjusted Scope</p>
+          <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full bg-amber-400 rounded-full" style="width:${scopePct}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>`
+}
+
+// ═══════════════════════════════════════════════════════
+// Filter controls
+// ═══════════════════════════════════════════════════════
+document.getElementById('filterToggle').addEventListener('click', () => {
+  document.getElementById('filterPanel').classList.toggle('hidden')
+})
+
+document.getElementById('sortSelect').addEventListener('change', e => {
+  state.sort = e.target.value
+  state.page = 1
+  loadAssets()
+})
+
+document.querySelectorAll('.risk-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const risk = btn.dataset.risk
+    if (state.riskFilter === risk) {
+      state.riskFilter = null
+      btn.className = 'risk-filter-btn text-xs px-2 py-1 rounded border border-slate-200 text-slate-500 hover:bg-slate-50'
+    } else {
+      state.riskFilter = risk
+      document.querySelectorAll('.risk-filter-btn').forEach(b => {
+        b.className = 'risk-filter-btn text-xs px-2 py-1 rounded border border-slate-200 text-slate-500 hover:bg-slate-50'
+      })
+      btn.className = `risk-filter-btn risk-badge-${risk} text-xs px-2 py-1 rounded font-semibold`
+    }
+    state.page = 1
+    loadAssets()
+  })
+})
+
+let searchTimeout
+document.getElementById('searchInput').addEventListener('input', e => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    state.page = 1
+    loadAssets()
+  }, 300)
+})
+
+// ═══════════════════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════════════════
+loadKPIs()
+loadAssets()
+</script>
+</body>
+</html>

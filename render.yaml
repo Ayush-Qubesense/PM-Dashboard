@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: predictive-maintenance-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    # Render free tier sleeps after 15 min of inactivity.
+    # First request after sleep will retrain ML models (~20-30s cold start).
+    envVars:
+      - key: CSV_PATH
+        value: /app/MaintenanceTelematicsData_synthetic_10k.csv
