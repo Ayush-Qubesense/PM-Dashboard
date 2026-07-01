@@ -1,10 +1,7 @@
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 
 from data_processor import (
     load_data,
@@ -39,15 +36,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
-
-app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="assets")
-
-
-@app.get("/")
-def serve_dashboard():
-    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 @app.get("/api/fleet/kpis", response_model=FleetKPIResponse)
