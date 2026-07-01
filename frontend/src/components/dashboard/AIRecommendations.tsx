@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Wrench, Calendar, Eye, CheckCircle, ChevronRight } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import type { AssetRecommendations } from '../../types'
 import { api } from '../../api/client'
 
-const TYPE_ICON: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const TYPE_ICON: Record<string, LucideIcon> = {
   CREATE_WO: Wrench,
   ADJUST_PM: Calendar,
   ADD_TASK: Eye,

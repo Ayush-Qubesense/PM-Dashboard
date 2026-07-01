@@ -11,6 +11,7 @@ import {
   Bell,
   Settings,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const NAV_ITEMS = [
   { label: 'Overview', icon: LayoutDashboard },
@@ -65,7 +66,7 @@ function NavItem({
   badge,
 }: {
   label: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  icon: LucideIcon
   active?: boolean
   badge?: string
 }) {
