@@ -1,6 +1,5 @@
 import type { AssetDetail, RiskLevel } from '../../types'
 import { MapPin, Clock, RefreshCw } from 'lucide-react'
-import generatorImg from '/generator.png'
 
 const RISK_BADGE: Record<RiskLevel, string> = {
   Critical: 'bg-red-600 text-white',
@@ -41,7 +40,7 @@ export function AssetDetailPanel({ detail, loading }: Props) {
   if (!detail) {
     return (
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center h-full gap-3">
-        <img src={generatorImg} alt="Generator" style={{ width: 64, opacity: 0.2 }} />
+        <img src="/generator.png" alt="Generator" style={{ width: 64, opacity: 0.2 }} />
         <p className="text-slate-400 text-sm">Select an asset to view details</p>
       </div>
     )
@@ -64,7 +63,7 @@ export function AssetDetailPanel({ detail, loading }: Props) {
 
       {/* Generator image */}
       <div className="flex justify-center pt-4 pb-2">
-        <img src={generatorImg} alt="Generator" style={{ width: 120 }} />
+        <img src="/generator.png" alt="Generator" style={{ width: 120 }} />
       </div>
 
       {/* Meta row */}
