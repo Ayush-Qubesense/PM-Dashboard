@@ -22,8 +22,8 @@
   .score-High     { color:#ff9f43; }
   .score-Medium   { color:#d97706; }
   .score-Low      { color:#28c76f; }
-  .row-selected { background:#f3f2ff !important; }
-  .row-selected td { border-bottom-color:#d6d3fb !important; }
+  .row-selected { background:#EDF3FD !important; }
+  .row-selected td { border-bottom-color:#CEDDFA !important; }
   tr.asset-row:hover { background:#f8f7fa; cursor:pointer; }
   .toast { animation: fadeInOut 3s forwards; }
   @keyframes fadeInOut {
@@ -47,7 +47,7 @@
     transition: background 0.15s, color 0.15s;
     position: relative;
   }
-  .navbar-icon-btn:hover { background: rgba(115,103,240,0.08); color: #7367f0; }
+  .navbar-icon-btn:hover { background: rgba(90,141,238,0.08); color: #5A8DEE; }
   /* Frest nav items */
   .sb-nav-btn { border: none; background: none; cursor: pointer; }
 </style>
@@ -107,7 +107,7 @@
     <div class="w-px h-6 bg-[#ebe9f1] mx-1"></div>
     <!-- User avatar -->
     <button class="flex items-center gap-2 hover:bg-[#f8f7fa] rounded-lg px-2 py-1 transition-colors" title="Account">
-      <div class="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-[#7367f0] to-[#9e95f5] flex items-center justify-center text-white text-[13px] font-bold ring-2 ring-white shadow-sm">NG</div>
+      <div class="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-[#5A8DEE] to-[#94B5F4] flex items-center justify-center text-white text-[13px] font-bold ring-2 ring-white shadow-sm">NG</div>
       <div class="hidden xl:flex flex-col leading-none gap-[3px]">
         <span class="text-[13px] font-semibold text-[#5e5873]">NG Fleet</span>
         <span class="text-[11px] text-[#b9b9c3]">Admin</span>
@@ -139,20 +139,20 @@
   <header class="bg-white border-b border-[#ebe9f1] px-5 py-3 flex items-center justify-between flex-shrink-0">
     <div class="flex items-center gap-3">
       <div class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded-lg bg-[#7367f0]/10 flex items-center justify-center">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7367f0" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <div class="w-7 h-7 rounded-lg bg-[#5A8DEE]/10 flex items-center justify-center">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5A8DEE" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
         <span class="font-semibold text-[#5e5873] text-sm">AI Health &amp; Predictive Maintenance</span>
-        <span class="text-[10px] bg-[#7367f0] text-white px-1.5 py-0.5 rounded font-bold">Beta</span>
+        <span class="text-[10px] bg-[#5A8DEE] text-white px-1.5 py-0.5 rounded font-bold">Beta</span>
       </div>
     </div>
     <div class="flex items-center gap-3">
-      <select id="dateRange" class="text-xs bg-white border border-[#d8d6de] rounded-lg px-2.5 py-1.5 text-[#6e6b7b] focus:outline-none focus:ring-2 focus:ring-[#7367f0] focus:border-[#7367f0]">
+      <select id="dateRange" class="text-xs bg-white border border-[#d8d6de] rounded-lg px-2.5 py-1.5 text-[#6e6b7b] focus:outline-none focus:ring-2 focus:ring-[#5A8DEE] focus:border-[#5A8DEE]">
         <option value="7d">Last 7 Days</option>
         <option value="30d">Last 30 Days</option>
         <option value="90d">Last 90 Days</option>
       </select>
-      <button class="flex items-center gap-1.5 bg-white border border-[#d8d6de] rounded-lg px-2.5 py-1.5 text-xs text-[#6e6b7b] hover:border-[#7367f0] hover:text-[#7367f0] transition-colors">
+      <button class="flex items-center gap-1.5 bg-white border border-[#d8d6de] rounded-lg px-2.5 py-1.5 text-xs text-[#6e6b7b] hover:border-[#5A8DEE] hover:text-[#5A8DEE] transition-colors">
         <span class="font-medium">NG Fleet</span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
       </button>
@@ -182,15 +182,15 @@
           <div class="flex gap-2">
             <div class="relative flex-1">
               <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#b9b9c3]" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input id="searchInput" placeholder="Search assets..." class="w-full pl-7 pr-3 py-1.5 text-xs border border-[#d8d6de] text-[#6e6b7b] placeholder-[#b9b9c3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7367f0] focus:border-[#7367f0]" />
+              <input id="searchInput" placeholder="Search assets..." class="w-full pl-7 pr-3 py-1.5 text-xs border border-[#d8d6de] text-[#6e6b7b] placeholder-[#b9b9c3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5A8DEE] focus:border-[#5A8DEE]" />
             </div>
-            <button id="filterToggle" class="flex items-center gap-1 px-3 py-1.5 text-xs border border-[#d8d6de] rounded-lg text-[#6e6b7b] hover:bg-[#f8f7fa] hover:border-[#7367f0] hover:text-[#7367f0] transition-colors">
+            <button id="filterToggle" class="flex items-center gap-1 px-3 py-1.5 text-xs border border-[#d8d6de] rounded-lg text-[#6e6b7b] hover:bg-[#f8f7fa] hover:border-[#5A8DEE] hover:text-[#5A8DEE] transition-colors">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
               Filters
             </button>
           </div>
           <div id="filterPanel" class="hidden mt-2 flex gap-2 flex-wrap">
-            <select id="sortSelect" class="text-xs border border-[#d8d6de] rounded px-2 py-1 text-[#6e6b7b] focus:outline-none focus:ring-2 focus:ring-[#7367f0]">
+            <select id="sortSelect" class="text-xs border border-[#d8d6de] rounded px-2 py-1 text-[#6e6b7b] focus:outline-none focus:ring-2 focus:ring-[#5A8DEE]">
               <option value="risk_level">Sort: Risk Level</option>
               <option value="health_score">Sort: Health Score</option>
               <option value="eta">Sort: ETA</option>
@@ -231,13 +231,13 @@
         <div class="flex-1 flex flex-col items-center justify-center gap-3 text-[#d8d6de]">
           <svg width="64" height="44" viewBox="0 0 200 130" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="10" y="30" width="180" height="80" rx="6" fill="#f8f7fa" stroke="#ebe9f1"/>
-            <rect x="20" y="40" width="60" height="60" rx="4" fill="#f3f2ff" stroke="#ebe9f1"/>
-            <circle cx="120" cy="70" r="30" fill="#f3f2ff" stroke="#ebe9f1"/>
+            <rect x="20" y="40" width="60" height="60" rx="4" fill="#EDF3FD" stroke="#ebe9f1"/>
+            <circle cx="120" cy="70" r="30" fill="#EDF3FD" stroke="#ebe9f1"/>
             <circle cx="120" cy="70" r="15" fill="#ebe9f1" stroke="#ebe9f1"/>
-            <rect x="158" y="45" width="22" height="50" rx="3" fill="#f3f2ff" stroke="#d6d3fb"/>
-            <rect x="60" y="15" width="10" height="25" rx="3" fill="#f3f2ff" stroke="#ebe9f1"/>
-            <circle cx="40" cy="118" r="10" fill="#f3f2ff" stroke="#ebe9f1"/>
-            <circle cx="160" cy="118" r="10" fill="#f3f2ff" stroke="#ebe9f1"/>
+            <rect x="158" y="45" width="22" height="50" rx="3" fill="#EDF3FD" stroke="#CEDDFA"/>
+            <rect x="60" y="15" width="10" height="25" rx="3" fill="#EDF3FD" stroke="#ebe9f1"/>
+            <circle cx="40" cy="118" r="10" fill="#EDF3FD" stroke="#ebe9f1"/>
+            <circle cx="160" cy="118" r="10" fill="#EDF3FD" stroke="#ebe9f1"/>
           </svg>
           <p class="text-sm text-[#b9b9c3]">Select an asset to view details</p>
         </div>
@@ -253,7 +253,7 @@
           <div id="recsPanel" class="p-4 space-y-3 flex-1">
             <p class="text-xs text-[#b9b9c3] text-center py-3">Select an asset to view recommendations</p>
           </div>
-          <button id="viewAllRecs" class="hidden items-center justify-center gap-1 text-xs text-[#7367f0] hover:text-[#6357d6] py-2.5 border-t border-[#ebe9f1] transition-colors">
+          <button id="viewAllRecs" class="hidden items-center justify-center gap-1 text-xs text-[#5A8DEE] hover:text-[#3D74E0] py-2.5 border-t border-[#ebe9f1] transition-colors">
             View all recommendations
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
           </button>
@@ -313,10 +313,10 @@ const navItems = [
 document.getElementById('nav').innerHTML = navItems.map(item => `
   <button class="sb-nav-btn flex items-center gap-2 px-3.5 py-3 rounded-lg transition-all duration-150 relative whitespace-nowrap"
     style="${item.active
-      ? 'background:rgba(115,103,240,0.12);color:#7367f0;'
+      ? 'background:rgba(90,141,238,0.12);color:#5A8DEE;'
       : 'background:transparent;color:#5e5873;'
     }"
-    onmouseover="${item.active ? '' : "this.style.background='rgba(115,103,240,0.08)';this.style.color='#7367f0';"}"
+    onmouseover="${item.active ? '' : "this.style.background='rgba(90,141,238,0.08)';this.style.color='#5A8DEE';"}"
     onmouseout="${item.active ? '' : "this.style.background='transparent';this.style.color='#5e5873';"}"
   >
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -324,8 +324,8 @@ document.getElementById('nav').innerHTML = navItems.map(item => `
          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
          style="flex-shrink:0">${item.icon}</svg>
     <span style="font-size:14px;font-weight:${item.active ? '600' : '500'};line-height:1">${item.label}</span>
-    ${item.badge ? `<span style="background:#7367f0;color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:700;line-height:1.4;margin-left:2px">${item.badge}</span>` : ''}
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="${item.active ? '#7367f0' : '#a0a0b0'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M6 9l6 6 6-6"/></svg>
+    ${item.badge ? `<span style="background:#5A8DEE;color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:700;line-height:1.4;margin-left:2px">${item.badge}</span>` : ''}
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="${item.active ? '#5A8DEE' : '#a0a0b0'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M6 9l6 6 6-6"/></svg>
   </button>
 `).join('')
 
@@ -442,7 +442,7 @@ async function loadKPIs() {
     ${kpiCard('Predicted Failures (30d)', k.predicted_failures_30d.toLocaleString(),
       '<span class="text-[#ff9f43] text-[10px] font-medium">High confidence</span>')}
     ${kpiCard('PM Jobs Adjusted', k.pm_jobs_adjusted_count.toLocaleString(),
-      '<span class="text-[#7367f0] text-[10px] font-medium">This week</span>')}
+      '<span class="text-[#5A8DEE] text-[10px] font-medium">This week</span>')}
   `
 }
 
@@ -506,7 +506,7 @@ async function loadAssets() {
   let winEnd = Math.min(totalPages, winStart + WINDOW - 1)
   if (winEnd - winStart + 1 < WINDOW) winStart = Math.max(1, winEnd - WINDOW + 1)
 
-  const btnClass = (active) => `page-btn w-6 h-6 rounded text-[11px] font-medium transition-colors ${active ? 'bg-[#7367f0] text-white' : 'text-[#6e6b7b] hover:bg-[#f3f2ff]'}`
+  const btnClass = (active) => `page-btn w-6 h-6 rounded text-[11px] font-medium transition-colors ${active ? 'bg-[#5A8DEE] text-white' : 'text-[#6e6b7b] hover:bg-[#EDF3FD]'}`
   const pageBtn = (p) => `<button data-page="${p}" class="${btnClass(p === state.page)}">${p}</button>`
   const ellipsis = `<span class="text-slate-400 text-xs px-0.5">…</span>`
 
@@ -540,7 +540,7 @@ function riskBadgeFull(risk) {
 
 const REC_COLORS = {
   CREATE_WO: 'bg-[#ea5455] hover:bg-[#e04244] text-white',
-  ADJUST_PM: 'bg-[#7367f0] hover:bg-[#6357d6] text-white',
+  ADJUST_PM: 'bg-[#5A8DEE] hover:bg-[#3D74E0] text-white',
   ADD_TASK:  'bg-[#6e6b7b] hover:bg-[#5e5873] text-white',
   MONITOR:   'bg-[#82868b] hover:bg-[#74787d] text-white',
 }
@@ -587,15 +587,15 @@ function renderDetail(d, panel) {
 
     <div class="grid grid-cols-3 gap-2 px-4 py-2 border-b border-[#ebe9f1] text-[10px] text-[#6e6b7b]">
       <div class="flex items-center gap-1">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7367f0" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5A8DEE" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         ${d.location_city}, ${d.location_state}
       </div>
       <div class="flex items-center gap-1">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7367f0" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5A8DEE" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         ${t.runtime_hours ? Math.round(t.runtime_hours).toLocaleString() + ' hrs' : '—'}
       </div>
       <div class="flex items-center gap-1">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7367f0" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5A8DEE" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>
         ${timeAgo(t.recorded_at)}
       </div>
     </div>
@@ -682,8 +682,8 @@ function renderRecs(recs) {
     const btnClass = done ? '' : (REC_COLORS[r.rec_type] ?? REC_COLORS.MONITOR)
     return `
       <div class="flex items-start gap-3 p-3 rounded-lg border transition-all ${done ? 'border-[#28c76f]/30 bg-[#28c76f]/5 opacity-70' : 'border-[#ebe9f1] bg-[#f8f7fa]'}" data-rec-id="${r.rec_id}" data-rec-title="${r.title}">
-        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${done ? 'bg-[#28c76f]/10' : 'bg-[#7367f0]/10'}">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${done ? '#28c76f' : '#7367f0'}" stroke-width="2">${done ? '<polyline points="20 6 9 17 4 12"/>' : icon}</svg>
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${done ? 'bg-[#28c76f]/10' : 'bg-[#5A8DEE]/10'}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${done ? '#28c76f' : '#5A8DEE'}" stroke-width="2">${done ? '<polyline points="20 6 9 17 4 12"/>' : icon}</svg>
         </div>
         <div class="flex-1 min-w-0">
           <div class="text-xs font-semibold text-[#5e5873] mb-0.5">${r.title}</div>
@@ -733,7 +733,7 @@ function renderPM(job) {
   panel.innerHTML = `
     <div class="space-y-3">
       <div class="flex items-center gap-2">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7367f0" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5A8DEE" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
         <span class="text-xs font-semibold text-[#5e5873]">${job.job_code} – ${job.job_name}</span>
       </div>
       <div class="grid grid-cols-2 gap-3">
@@ -757,7 +757,7 @@ function renderPM(job) {
         <div>
           <p class="text-[10px] text-[#6e6b7b] mb-0.5">Original Scope</p>
           <div class="h-1.5 bg-[#ebe9f1] rounded-full overflow-hidden">
-            <div class="h-full bg-[#7367f0] rounded-full" style="width:100%"></div>
+            <div class="h-full bg-[#5A8DEE] rounded-full" style="width:100%"></div>
           </div>
         </div>
         <div>
