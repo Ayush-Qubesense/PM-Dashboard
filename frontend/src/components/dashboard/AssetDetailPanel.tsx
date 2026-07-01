@@ -40,7 +40,7 @@ export function AssetDetailPanel({ detail, loading }: Props) {
   if (!detail) {
     return (
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center h-full gap-3">
-        <img src="/generator.png" alt="Generator" style={{ width: 64, opacity: 0.2 }} />
+        <GeneratorSVG size={64} className="opacity-20" />
         <p className="text-slate-400 text-sm">Select an asset to view details</p>
       </div>
     )
@@ -63,7 +63,7 @@ export function AssetDetailPanel({ detail, loading }: Props) {
 
       {/* Generator image */}
       <div className="flex justify-center pt-4 pb-2">
-        <img src="/generator.png" alt="Generator" style={{ width: 120 }} />
+        <GeneratorSVG size={120} className="text-slate-300" />
       </div>
 
       {/* Meta row */}
@@ -170,5 +170,34 @@ function TelRow({ label, value }: { label: string; value: string | null | undefi
       <span className="text-slate-400">{label}</span>
       <span className="font-medium text-slate-700">{value ?? '—'}</span>
     </div>
+  )
+}
+
+function GeneratorSVG({ size, className }: { size: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size * 0.65}
+      viewBox="0 0 200 130"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth="3"
+    >
+      {/* Body */}
+      <rect x="10" y="30" width="180" height="80" rx="6" fill="#f1f5f9" stroke="#cbd5e1" strokeWidth="2" />
+      {/* Engine block */}
+      <rect x="20" y="40" width="60" height="60" rx="4" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1.5" />
+      {/* Alternator */}
+      <circle cx="120" cy="70" r="30" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1.5" />
+      <circle cx="120" cy="70" r="15" fill="#cbd5e1" stroke="#94a3b8" strokeWidth="1.5" />
+      {/* Output panel */}
+      <rect x="158" y="45" width="22" height="50" rx="3" fill="#dbeafe" stroke="#93c5fd" strokeWidth="1.5" />
+      {/* Exhaust */}
+      <rect x="60" y="15" width="10" height="25" rx="3" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1.5" />
+      {/* Wheels */}
+      <circle cx="40" cy="118" r="10" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1.5" />
+      <circle cx="160" cy="118" r="10" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1.5" />
+    </svg>
   )
 }
