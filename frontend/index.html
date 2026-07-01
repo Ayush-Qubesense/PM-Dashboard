@@ -22,7 +22,7 @@
   .score-High     { color:#ff9f43; }
   .score-Medium   { color:#d97706; }
   .score-Low      { color:#28c76f; }
-  .row-selected { background:#EDF3FD !important; }
+  .row-selected { background:rgba(90,141,238,0.18) !important; }
   .row-selected td { border-bottom-color:#CEDDFA !important; }
   tr.asset-row:hover { background:#f8f7fa; cursor:pointer; }
   .toast { animation: fadeInOut 3s forwards; }
@@ -202,16 +202,16 @@
           </div>
         </div>
 
-        <div class="flex-1">
-          <table class="w-full h-full text-xs border-collapse">
+        <div class="flex-1 overflow-x-auto">
+          <table class="h-full text-xs border-collapse" style="min-width:640px;width:100%;">
             <thead class="bg-[#f8f7fa]">
               <tr class="border-b border-[#ebe9f1]">
                 <th class="text-left px-4 py-2 font-semibold text-[#6e6b7b] whitespace-nowrap">Asset</th>
-                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b]">Health</th>
-                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b]">Risk</th>
-                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b]">Top Risk</th>
-                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b]">Issue</th>
-                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b]">ETA</th>
+                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b] whitespace-nowrap">Health</th>
+                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b] whitespace-nowrap">Risk</th>
+                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b] whitespace-nowrap">Top Risk</th>
+                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b] whitespace-nowrap">Issue</th>
+                <th class="text-left px-3 py-2 font-semibold text-[#6e6b7b] whitespace-nowrap">ETA</th>
               </tr>
             </thead>
             <tbody id="assetTableBody">
@@ -480,9 +480,9 @@ async function loadAssets() {
         <div class="font-bold text-sm ${scoreClass(a.health_score)}">${a.health_score}</div>
         ${sparklineSVG(a.sparkline)}
       </td>
-      <td class="px-3 py-2.5">${riskBadge(a.risk_level)}</td>
-      <td class="px-3 py-2.5 text-[#6e6b7b] text-[11px]">${a.top_risk_parameter ?? '—'}</td>
-      <td class="px-3 py-2.5 text-[#6e6b7b] text-[11px]">${a.predicted_issue ?? '—'}</td>
+      <td class="px-3 py-2.5 whitespace-nowrap">${riskBadge(a.risk_level)}</td>
+      <td class="px-3 py-2.5 text-[#6e6b7b] text-[11px] whitespace-nowrap">${a.top_risk_parameter ?? '—'}</td>
+      <td class="px-3 py-2.5 text-[#6e6b7b] text-[11px] whitespace-nowrap">${a.predicted_issue ?? '—'}</td>
       <td class="px-3 py-2.5 text-[#6e6b7b] text-[11px] whitespace-nowrap">${a.predicted_eta_label ?? '—'}</td>
     </tr>
   `).join('') || '<tr><td colspan="6" class="text-center py-6 text-[#b9b9c3] text-xs">No assets found</td></tr>'
@@ -491,6 +491,11 @@ async function loadAssets() {
   tbody.querySelectorAll('.asset-row').forEach(row => {
     row.addEventListener('click', () => selectAsset(row.dataset.id))
   })
+
+  // Auto-select the first asset until the user picks one themselves
+  if (state.selectedId === null && data.assets.length > 0) {
+    selectAsset(data.assets[0].asset_id)
+  }
 
   // Pagination info
   const total = data.total
