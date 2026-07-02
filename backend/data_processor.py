@@ -1,5 +1,6 @@
 import math
 import os
+import random
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -332,6 +333,7 @@ def get_asset_health_list(
     risk_filter: str | None = None,
     page: int = 1,
     limit: int = 5,
+    seed: int | None = None,
 ) -> dict:
     latest = _get_latest_rows()
     items = []
@@ -363,6 +365,13 @@ def get_asset_health_list(
         items.sort(key=lambda x: x["health_score"])
     elif sort == "eta":
         items.sort(key=lambda x: (x["predicted_eta_hours"] is None, x["predicted_eta_hours"] or 9999))
+    elif sort == "random":
+        # Pin the worst-condition asset (lowest health score) first, then
+        # randomize the rest for variety.
+        pinned = min(items, key=lambda x: x["health_score"]) if items else None
+        rest = [i for i in items if i is not pinned]
+        random.Random(seed).shuffle(rest)
+        items = ([pinned] if pinned else []) + rest
 
     if risk_filter:
         items = [i for i in items if i["risk_level"] == risk_filter]

@@ -288,6 +288,9 @@ const API_BASE = _apiEnv.startsWith('%') ? '/api' : _apiEnv
 // ═══════════════════════════════════════════════════════
 const state = {
   sort: 'risk_level',
+  customSort: false, // becomes true once the user picks a sort or a risk filter — until then the list order is randomized for variety
+  randomSeed: Math.floor(Math.random() * 1e9),
+  pinnedAssetId: null, // the lowest-health-score asset the backend puts first while unsorted — always shown with the white generator image
   riskFilter: null,
   page: 1,
   selectedId: null,
@@ -399,8 +402,17 @@ function gaugeSVG(score, label) {
     </svg>`
 }
 
-function genIcon() {
-  return `<img src="/assets/generator.png" class="w-full h-full object-contain" alt="Generator"/>`
+const GENERATOR_IMAGES = ['/assets/generator.png', '/assets/generator-red.png', '/assets/generator-blue.png']
+function generatorImage(assetId) {
+  if (!state.customSort && state.pinnedAssetId && String(assetId) === String(state.pinnedAssetId)) {
+    return GENERATOR_IMAGES[0]
+  }
+  const n = parseInt(String(assetId).replace(/\D/g, ''), 10) || 0
+  return GENERATOR_IMAGES[n % GENERATOR_IMAGES.length]
+}
+
+function genIcon(assetId) {
+  return `<img src="${generatorImage(assetId)}" class="w-full h-full object-contain" alt="Generator"/>`
 }
 
 function showToast(msg, type = 'success') {
@@ -459,10 +471,19 @@ function kpiCard(title, value, sub) {
 // Asset Health List
 // ═══════════════════════════════════════════════════════
 async function loadAssets() {
-  const params = new URLSearchParams({ sort: state.sort, page: state.page, limit: 5 })
+  const params = new URLSearchParams({
+    sort: state.customSort ? state.sort : 'random',
+    page: state.page,
+    limit: 5,
+  })
+  if (!state.customSort) params.set('seed', state.randomSeed)
   if (state.riskFilter) params.set('risk_level', state.riskFilter)
   const res = await fetch((API_BASE || '/api') + '/fleet/assets/health?' + params)
   const data = await res.json()
+
+  if (!state.customSort && state.page === 1 && data.assets.length > 0) {
+    state.pinnedAssetId = data.assets[0].asset_id
+  }
 
   const tbody = document.getElementById('assetTableBody')
   tbody.innerHTML = data.assets.map(a => `
@@ -470,7 +491,7 @@ async function loadAssets() {
         data-id="${a.asset_id}">
       <td class="px-4 py-2.5">
         <div class="flex items-center gap-2">
-          <div class="w-12 h-12 rounded bg-white flex items-center justify-center flex-shrink-0 border border-[#ebe9f1]">${genIcon()}</div>
+          <div class="w-12 h-12 rounded bg-white flex items-center justify-center flex-shrink-0 border border-[#ebe9f1]">${genIcon(a.asset_id)}</div>
           <div>
             <div class="font-semibold text-[#5e5873] text-[11px]">${a.display_name}</div>
             <div class="text-[#b9b9c3] text-[10px]">${a.capacity_kw} kW</div>
@@ -586,7 +607,7 @@ function renderDetail(d, panel) {
     </div>
 
     <div class="relative border-b border-[#ebe9f1]">
-      <img src="/assets/generator.png" class="w-full h-44 object-contain bg-[#f8f7fa]" alt="Generator"/>
+      <img src="${generatorImage(d.asset_id)}" class="w-full h-44 object-contain bg-[#f8f7fa]" alt="Generator"/>
       ${d.risk_level === 'Critical' || d.risk_level === 'High' ?
         '<div class="absolute top-2 right-2 w-5 h-5 bg-[#ea5455] rounded-full flex items-center justify-center text-white text-xs font-bold">!</div>' : ''}
     </div>
@@ -785,6 +806,7 @@ document.getElementById('filterToggle').addEventListener('click', () => {
 
 document.getElementById('sortSelect').addEventListener('change', e => {
   state.sort = e.target.value
+  state.customSort = true
   state.page = 1
   loadAssets()
 })
@@ -802,6 +824,7 @@ document.querySelectorAll('.risk-filter-btn').forEach(btn => {
       })
       btn.className = `risk-filter-btn risk-badge-${risk} text-xs px-2 py-1 rounded font-semibold`
     }
+    state.customSort = true
     state.page = 1
     loadAssets()
   })

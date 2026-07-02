@@ -45,12 +45,13 @@ def fleet_kpis():
 
 @app.get("/api/fleet/assets/health", response_model=AssetHealthListResponse)
 def asset_health_list(
-    sort: str = Query("risk_level", enum=["risk_level", "health_score", "eta"]),
+    sort: str = Query("risk_level", enum=["risk_level", "health_score", "eta", "random"]),
     risk_level: str | None = Query(None, alias="risk_level"),
     page: int = Query(1, ge=1),
     limit: int = Query(5, ge=1, le=50),
+    seed: int | None = Query(None),
 ):
-    return get_asset_health_list(sort=sort, risk_filter=risk_level, page=page, limit=limit)
+    return get_asset_health_list(sort=sort, risk_filter=risk_level, page=page, limit=limit, seed=seed)
 
 
 @app.get("/api/assets/{asset_id}/detail", response_model=AssetDetailResponse)
